@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional
 
 import pandas as pd
 import ai_wonder as wonder
@@ -19,9 +19,9 @@ class BuildingInputSchema(BaseModel):
     building_area_sqm: int
     building_height_m: int
     number_of_floors: int
-    time_to_extinguish_min: int
-    response_time_min: int
-    number_of_fire_extinguishers: int
+    time_to_extinguish_min: Optional[int] =None
+    response_time_min: Optional[int]=None
+    number_of_fire_extinguishers: Optional[int]=None
     number_of_emergency_exits: int
     number_of_fire_alarms: int
     width_of_nearby_roads_m: int
@@ -46,6 +46,11 @@ def read_root():
 def predict(
     input: BuildingInputSchema
 ):
+    df = pd.read_csv('hanoi_fire.csv')
+    mean_time_to_extinguish_min = df['Time_to_Extinguish_(min)'].mean()
+    mean_response_time_min = df['Response_Time_(min)'].mean()
+    mean_number_of_fire_extinguishers = df['Number_of_Fire_Extinguishers'].mean()
+
     # Make datapoint from user input
     point = pd.DataFrame([{
         'Building_Type': input.building_type,
@@ -61,9 +66,9 @@ def predict(
         'Building_Area_(sqm)': input.building_area_sqm,
         'Building_Height_(m)': input.building_height_m,
         'Number_of_Floors': input.number_of_floors,
-        'Time_to_Extinguish_(min)': input.time_to_extinguish_min,
-        'Response_Time_(min)': input.response_time_min,
-        'Number_of_Fire_Extinguishers': input.number_of_fire_extinguishers,
+        'Time_to_Extinguish_(min)': mean_time_to_extinguish_min,
+        'Response_Time_(min)': mean_response_time_min,
+        'Number_of_Fire_Extinguishers': mean_number_of_fire_extinguishers,
         'Number_of_Emergency_Exits': input.number_of_emergency_exits,
         'Number_of_Fire_Alarms': input.number_of_fire_alarms,
         'Width_of_Nearby_Roads_(m)': input.width_of_nearby_roads_m,
